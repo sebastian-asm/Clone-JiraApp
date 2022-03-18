@@ -8,7 +8,7 @@ interface Props {
   title?: string;
 }
 
-export const Layout: FC<Props> = ({ title = 'JiraApp', children }) => {
+export const Layout: FC<Props> = ({ title = 'Home - JiraApp', children }) => {
   return (
     <Box sx={{ flexFlow: 1 }}>
       <Head>
