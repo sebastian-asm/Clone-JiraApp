@@ -1,7 +1,9 @@
 import { Entry } from '../../interfaces';
 import { EntriesState } from './';
 
-type EntriesType = { type: 'Entry - Add'; payload: Entry };
+type EntriesType =
+  | { type: 'Entry - Add'; payload: Entry }
+  | { type: 'Entry - Update'; payload: Entry };
 
 export const entriesReducer = (
   state: EntriesState,
@@ -12,6 +14,18 @@ export const entriesReducer = (
       return {
         ...state,
         entries: [...state.entries, action.payload],
+      };
+
+    case 'Entry - Update':
+      return {
+        ...state,
+        entries: state.entries.map((entry) => {
+          if (entry._id === action.payload._id) {
+            entry.status = action.payload.status;
+            // entry.description = action.payload.description
+          }
+          return entry;
+        }),
       };
 
     default:

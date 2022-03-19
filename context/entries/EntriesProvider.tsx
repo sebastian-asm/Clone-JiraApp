@@ -49,8 +49,15 @@ export const EntriesProvider: FC = ({ children }) => {
     });
   };
 
+  const updateEntry = (entry: Entry) => {
+    dispatch({
+      type: 'Entry - Update',
+      payload: entry,
+    });
+  };
+
   return (
-    <EntriesContext.Provider value={{ ...state, addEntry }}>
+    <EntriesContext.Provider value={{ ...state, addEntry, updateEntry }}>
       {children}
     </EntriesContext.Provider>
   );

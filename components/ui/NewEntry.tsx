@@ -4,10 +4,12 @@ import { AddCircleOutlined, SaveOutlined } from '@mui/icons-material';
 import { Box, Button, TextField } from '@mui/material';
 
 import { EntriesContext } from '../../context/entries';
+import { UIContext } from '../../context/ui';
 
 export const NewEntry = () => {
   const { addEntry } = useContext(EntriesContext);
-  const [isAdding, setIsAdding] = useState(false);
+  const { addingEntry, setAddingEntry } = useContext(UIContext);
+
   const [inputValue, setInputValue] = useState('');
   const [touched, setTouched] = useState(false);
 
@@ -21,12 +23,12 @@ export const NewEntry = () => {
     addEntry(inputValue);
     setInputValue('');
     setTouched(false);
-    setIsAdding(false);
+    setAddingEntry(false);
   };
 
   return (
     <Box sx={{ marginBottom: 2, paddingX: 1.5 }}>
-      {isAdding ? (
+      {addingEntry ? (
         <>
           <TextField
             value={inputValue}
@@ -44,7 +46,7 @@ export const NewEntry = () => {
           />
 
           <Box display="flex" justifyContent="space-between">
-            <Button onClick={() => setIsAdding(false)} variant="text">
+            <Button onClick={() => setAddingEntry(false)} variant="text">
               Cancelar
             </Button>
             <Button
@@ -59,7 +61,7 @@ export const NewEntry = () => {
         </>
       ) : (
         <Button
-          onClick={() => setIsAdding(true)}
+          onClick={() => setAddingEntry(true)}
           startIcon={<AddCircleOutlined />}
           fullWidth
           variant="outlined"
