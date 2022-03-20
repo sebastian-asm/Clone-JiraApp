@@ -14,5 +14,5 @@ docker-compose up -d
 MongoDB URI local:
 
 ```
-mongodb://localhost:27017/entriesdb
+mongodb://localhost:27017/jira-app
 ```
