@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { db } from '../../db';
+import { db, seedData } from '../../db';
+import { Entry } from '../../models';
 
 type Data = {
   ok: boolean;
@@ -12,19 +13,20 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   if (process.env.NODE_ENV === 'production') {
-    return res
-      .status(401)
-      .json({
-        ok: false,
-        message: 'Esta API no esta disponible en producción.',
-      });
+    return res.status(401).json({
+      ok: false,
+      message: 'Esta API no esta disponible en producción.',
+    });
   }
 
   await db.connect();
+  // en este punto es donde se interactua con la db
+  await Entry.deleteMany();
+  await Entry.insertMany(seedData.entries);
   await db.disconnet();
 
-  res.json({
+  res.status(201).json({
     ok: true,
-    message: 'Conexión exitosa a la base de datos.',
+    message: 'Se insertaron los datos de prueba exitosamente.',
   });
 }

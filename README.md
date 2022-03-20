@@ -16,3 +16,11 @@ MongoDB URI local:
 ```
 mongodb://localhost:27017/jira-app
 ```
+
+## APIs
+
+Llenar la db con datos de prueba
+
+```
+http://localhost:3000/api/seed
+```
