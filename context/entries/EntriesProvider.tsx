@@ -1,7 +1,5 @@
 import { FC, useReducer, useEffect } from 'react';
 
-import { v4 as uuidv4 } from 'uuid';
-
 import { entriesApi } from '../../apis';
 import { Entry } from '../../interfaces';
 import { EntriesContext, entriesReducer } from './';
@@ -19,35 +17,33 @@ export const EntriesProvider: FC = ({ children }) => {
 
   useEffect(() => {
     const getAllEntries = async () => {
-      const { data } = await entriesApi.get('/entries');
-      const entries: Entry[] = data.entries;
-
+      const { data } = await entriesApi.get<Entry[]>('/entries');
       dispatch({
         type: 'Entry - Get All',
-        payload: entries,
+        payload: data,
       });
     };
     getAllEntries();
   }, []);
 
-  const addEntry = (description: string) => {
-    const newEntry: Entry = {
-      _id: uuidv4(),
-      description,
-      createdAt: Date.now(),
-      status: 'pending',
-    };
-
+  const addEntry = async (description: string) => {
+    const { data } = await entriesApi.post<Entry>('/entries', { description });
     dispatch({
       type: 'Entry - Add',
-      payload: newEntry,
+      payload: data,
     });
   };
 
-  const updateEntry = (entry: Entry) => {
+  const updateEntry = async (entry: Entry) => {
+    const { _id, description, status } = entry;
+    const { data } = await entriesApi.put<Entry>(`/entries/${_id}`, {
+      description,
+      status,
+    });
+
     dispatch({
       type: 'Entry - Update',
-      payload: entry,
+      payload: data,
     });
   };
 

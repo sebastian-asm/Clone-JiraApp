@@ -4,7 +4,6 @@ import { db, seedData } from '../../db';
 import { Entry } from '../../models';
 
 type Data = {
-  ok: boolean;
   message: string;
 };
 
@@ -14,7 +13,6 @@ export default async function handler(
 ) {
   if (process.env.NODE_ENV === 'production') {
     return res.status(401).json({
-      ok: false,
       message: 'Esta API no esta disponible en producción.',
     });
   }
@@ -26,7 +24,6 @@ export default async function handler(
   await db.disconnet();
 
   res.status(201).json({
-    ok: true,
     message: 'Se insertaron los datos de prueba exitosamente.',
   });
 }
