@@ -18,12 +18,13 @@ export const entriesReducer = (
       };
 
     case 'Entry - Update':
+      const { _id, status, description } = action.payload;
       return {
         ...state,
         entries: state.entries.map((entry) => {
-          if (entry._id === action.payload._id) {
-            entry.status = action.payload.status;
-            // entry.description = action.payload.description
+          if (entry._id === _id) {
+            entry.status = status;
+            entry.description = description;
           }
           return entry;
         }),

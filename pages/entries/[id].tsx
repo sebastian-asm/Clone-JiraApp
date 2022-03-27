@@ -1,4 +1,5 @@
-import { ChangeEvent, useState, useMemo } from 'react';
+import { ChangeEvent, useState, useMemo, FC, useContext } from 'react';
+import { GetServerSideProps } from 'next';
 
 import {
   Button,
@@ -19,13 +20,21 @@ import {
 import { DeleteOutline, SaveOutlined } from '@mui/icons-material';
 
 import { Layout } from '../../components/layouts';
-import { EntryStatus } from '../../interfaces';
+import { Entry, EntryStatus } from '../../interfaces';
+import { dbEntries } from '../../db';
+import { EntriesContext } from '../../context/entries';
+import { date } from '../../utils';
+
+interface Props {
+  entry: Entry;
+}
 
 const validStatus: EntryStatus[] = ['pending', 'in-progress', 'finished'];
 
-export default function EntryPage() {
-  const [inputValue, setInputValue] = useState('');
-  const [status, setStatus] = useState<EntryStatus>('pending');
+const EntryPage: FC<Props> = ({ entry }) => {
+  const { updateEntry } = useContext(EntriesContext);
+  const [inputValue, setInputValue] = useState(entry.description);
+  const [status, setStatus] = useState<EntryStatus>(entry.status);
   const [touched, setTouched] = useState(false);
 
   // memorizando el valor del input para evitar renderizados innecesarios
@@ -43,15 +52,26 @@ export default function EntryPage() {
   };
 
   const handleClick = () => {
-    console.log({ inputValue, status });
+    if (inputValue.trim().length === 0) return;
+    updateEntry(
+      {
+        ...entry,
+        status,
+        description: inputValue,
+      },
+      true
+    );
   };
 
   return (
-    <Layout title="">
+    <Layout title={`Entrada: ${inputValue}`}>
       <Grid container justifyContent="center" sx={{ marginTop: 2 }}>
         <Grid item xs={12} sm={8} md={6}>
           <Card>
-            <CardHeader title="Entrada" subheader="Entrada creada el" />
+            <CardHeader
+              title="Entrada"
+              subheader={`Creada hace ${date.distanceToNow(entry.createdAt)}`}
+            />
             <CardContent>
               <TextField
                 value={inputValue}
@@ -106,4 +126,25 @@ export default function EntryPage() {
       </IconButton>
     </Layout>
   );
-}
+};
+
+// SSR: solo utilizar esta tecnica para construir la pagina una vez que el usuario
+// hace la solicitud (request bajo demanda), para evitar el contenido estatico
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const { id } = params as { id: string };
+  const entry = await dbEntries.getEntryById(id);
+
+  if (!entry)
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+
+  return {
+    props: { entry },
+  };
+};
+
+export default EntryPage;
