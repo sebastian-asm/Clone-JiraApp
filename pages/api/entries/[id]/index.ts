@@ -16,9 +16,11 @@ export default function (req: NextApiRequest, res: NextApiResponse<Data>) {
 
     switch (req.method) {
       case 'PUT':
-        return updatEntry(req, res);
+        return updateEntry(req, res);
       case 'GET':
         return getEntry(req, res);
+      case 'DELETE':
+        return deleteEntry(req, res);
 
       default:
         throw new Error('El método solicitado no existe.');
@@ -33,7 +35,7 @@ export default function (req: NextApiRequest, res: NextApiResponse<Data>) {
   }
 }
 
-const updatEntry = async (req: NextApiRequest, res: NextApiResponse) => {
+const updateEntry = async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
 
   try {
@@ -75,6 +77,25 @@ const getEntry = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!entry) throw new Error('La entrada no existe.');
 
     res.json(entry);
+  } catch (error) {
+    res.status(400).json({
+      message: (error as Error).message,
+    });
+  } finally {
+    await db.disconnet();
+  }
+};
+
+const deleteEntry = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { id } = req.query;
+
+  try {
+    await db.connect();
+
+    const deleteEntry = await Entry.findByIdAndDelete(id);
+    if (!deleteEntry) throw new Error('La entrada no existe.');
+
+    res.json(deleteEntry);
   } catch (error) {
     res.status(400).json({
       message: (error as Error).message,

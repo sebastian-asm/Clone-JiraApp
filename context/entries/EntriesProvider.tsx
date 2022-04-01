@@ -1,4 +1,5 @@
 import { FC, useReducer, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 import { useSnackbar } from 'notistack';
 
@@ -15,6 +16,7 @@ const UI_INITIAL_STATE: EntriesState = {
 };
 
 export const EntriesProvider: FC = ({ children }) => {
+  const router = useRouter();
   const [state, dispatch] = useReducer(entriesReducer, UI_INITIAL_STATE);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -61,8 +63,32 @@ export const EntriesProvider: FC = ({ children }) => {
     });
   };
 
+  const deleteEntry = async (id: string, showSnackBar = false) => {
+    const { data } = await entriesApi.delete<Entry>(`/entries/${id}`);
+
+    if (showSnackBar) {
+      enqueueSnackbar('Entrada eliminada', {
+        variant: 'success',
+        autoHideDuration: 3000,
+        anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'right',
+        },
+      });
+    }
+
+    dispatch({
+      type: 'Entry - Delete',
+      payload: data,
+    });
+
+    router.replace('/');
+  };
+
   return (
-    <EntriesContext.Provider value={{ ...state, addEntry, updateEntry }}>
+    <EntriesContext.Provider
+      value={{ ...state, addEntry, updateEntry, deleteEntry }}
+    >
       {children}
     </EntriesContext.Provider>
   );

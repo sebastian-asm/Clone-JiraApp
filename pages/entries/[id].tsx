@@ -32,7 +32,7 @@ interface Props {
 const validStatus: EntryStatus[] = ['pending', 'in-progress', 'finished'];
 
 const EntryPage: FC<Props> = ({ entry }) => {
-  const { updateEntry } = useContext(EntriesContext);
+  const { updateEntry, deleteEntry } = useContext(EntriesContext);
   const [inputValue, setInputValue] = useState(entry.description);
   const [status, setStatus] = useState<EntryStatus>(entry.status);
   const [touched, setTouched] = useState(false);
@@ -61,6 +61,10 @@ const EntryPage: FC<Props> = ({ entry }) => {
       },
       true
     );
+  };
+
+  const handleDelete = (id: string) => {
+    deleteEntry(id, true);
   };
 
   return (
@@ -115,6 +119,7 @@ const EntryPage: FC<Props> = ({ entry }) => {
       </Grid>
 
       <IconButton
+        onClick={() => handleDelete(entry._id)}
         sx={{
           position: 'fixed',
           bottom: 30,
